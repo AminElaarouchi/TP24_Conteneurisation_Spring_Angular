@@ -5,8 +5,9 @@ import com.example.appareil.entity.Categorie;
 import com.example.appareil.repository.AppareilRepository;
 import com.example.appareil.repository.CategorieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class AppareilService {
     public Appareil save(Appareil appareil) {
         Optional<Categorie> categorie = categorieRepository.findById(appareil.getCategorie().getId());
         if (categorie.isEmpty()) {
-            throw new RuntimeException("Category not found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found.");
         }
         appareil.setCategorie(categorie.get());
         return appareilRepository.save(appareil);
@@ -42,7 +43,7 @@ public class AppareilService {
     }
 
     public void update(Long id, Appareil appInfo) {
-        Appareil appareil = appareilRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("app not found with id " + id));
+        Appareil appareil = appareilRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "app not found with id " + id));
         appareil.setState(appInfo.isState());
         appareilRepository.save(appareil);
     }
